@@ -1,7 +1,7 @@
 #data/q-a.txt
 .idea
 data/.gitkeep
-
+venv
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
