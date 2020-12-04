@@ -4,10 +4,10 @@ plt.switch_backend('agg')
 import matplotlib.ticker as ticker
 import argparse
 import time, math, random
-from sklearn.model_seection import train_test_split
+from sklearn.model_selection import train_test_split
 import torch
 import torch.nn as nn
-
+import os
 from torch import optim
 
 import data as dataloader
@@ -74,7 +74,7 @@ def train(input_tensor, target_tensor, encoder, decoder, encoder_optimizer, deco
 
     input_length, target_length = input_tensor.size(0), target_tensor.size(0)
 
-    encoder_hidden = encoder.initHidden().to(device)
+    encoder_hidden = encoder.init_hidden().to(device)
 
     encoder_outputs = torch.zeros(max_length, encoder.hidden_size).to(device)
 
@@ -95,7 +95,7 @@ def train(input_tensor, target_tensor, encoder, decoder, encoder_optimizer, deco
         for di in range(target_length):
             decoder_output,decoder_hidden=decoder(decoder_input,decoder_hidden)
 
-            loss+criterion(decoder_output,target_tensor[di])
+            loss+=criterion(decoder_output,target_tensor[di])
 
             decoder_input=target_tensor[di]
     else:
@@ -172,5 +172,12 @@ if __name__ == "__main__":
                                  embedding_size=config.embedding_size,
                                  hidden_size=config.hidden_size).to(device)
 
-    encoder.load_state_dict(torch.load('encoder.pth'))
-    decoder.load_state_dict(torch.load('decoder.pth'))
+
+    print(encoder,decoder)
+    if os.path.isfile('./encoder.pth'):
+
+        encoder.load_state_dict(torch.load('encoder.pth'))
+        decoder.load_state_dict(torch.load('decoder.pth'))
+
+
+    trainiters(pairs, encoder, decoder, config.num_iters)
