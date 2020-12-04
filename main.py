@@ -84,6 +84,80 @@ def train(input_tensor, target_tensor, encoder, decoder, encoder_optimizer, deco
 
         encoder_outputs[ei] = encoder_output[0, 0]
 
+    decoder_input=torch.tensor([[dataloader.SOS_token]]).to(device)
+
+    decoder_hidden=encoder_hidden
+
+    use_teacher_forcing=True if random.random() < teacher_focing_ratio else False
+
+    if use_teacher_forcing:
+
+        for di in range(target_length):
+            decoder_output,decoder_hidden=decoder(decoder_input,decoder_hidden)
+
+            loss+criterion(decoder_output,target_tensor[di])
+
+            decoder_input=target_tensor[di]
+    else:
+        for di in range(target_length):
+            decoder_output,decoder_hidden=decoder(decoder_input,decoder_hidden)
+
+            topv,topi=decoder_output.topk(1)
+
+            decoder_input=topi.squeeze().detach()
+            loss+=criterion(decoder_output,target_tensor[di])
+
+            if decoder_input.item()==dataloader.EOS_token:
+                break
+
+
+    loss.backward()
+    encoder_optimizer.step()
+    decoder_optimizer.step()
+
+    return  loss.item()/target_length
+
+def trainiters(pairs,encoder,decoder,n_iters,
+               train_pairs_seed=0, print_every=1000, plot_every=1000, learning_rate=.01):
+    start=time.time()
+    plot_losses=[]
+    print_loss_total,plot_loss_total=0,0
+
+    train_pairs=[tensorFromPair(random.choice(pairs)) for i in range(n_iters)]
+
+    encoder_optimizer=optim.SGD(encoder.parameters(),lr=learning_rate)
+    decoder_optimizer=optim.SGD(decoder.parameters(),lr=learning_rate)
+
+    criterion=nn.NLLLoss()
+
+    for iter in range(1,n_iters+1):
+        pair=train_pairs[iter-1]
+
+        input_tensor,target_tensor=pair[0],pair[1]
+
+        loss=train(input_tensor,target_tensor,encoder,decoder,encoder_optimizer,decoder_optimizer,criterion)
+
+        print_loss_total+=loss
+        plot_loss_total+=loss
+
+        if iter %print_every==0:
+            print_loss_avg=print_loss_total/print_every
+            print_loss_total=0
+            print('%s (%d %d%%) %.4f' % (timeSince(start, iter / n_iters),
+                                         iter, iter / n_iters * 100, print_loss_avg))
+        if iter % plot_every:
+            plot_loss_avg=plot_loss_total/print_every
+
+            plot_losses.append(plot_loss_avg)
+            plot_loss_total=0
+    showPlot(plot_losses)
+
+    plt.savefig('baseline-GRU-loss')
+    torch.save(encoder.state_dict(), 'encoder.pth')
+    torch.save(decoder.state_dict(), 'decoder.pth')
+
+
+
 
 if __name__ == "__main__":
     config = argparser()
