@@ -51,3 +51,35 @@ def showPlot(points):
 def indexesFromSentence(lang,sentence):
     return [lang.word2index[word] for word in sentence.split(' ')]
 
+
+def tensorFromSentences(lang,sentence):
+    indexes=indexesFromSentence(lang,sentence)
+    indexes.append(dataloader.EOS_token)
+    return torch.tensor(indexes,dtype=torch.long,device=device).view(-1,1)
+
+def tensorFromPair(pair):
+    input_tensor=tensorFromSentences(input_lang,pair[0])
+    target_tensor=tensorFromSentences(output_lang,pair[1])
+    return (input_tensor,target_tensor)
+
+def train(input_tensor,target_tensor,encoder,decoder,encoder_optimizer,decoder_optimizer,
+          criterion, max_length=dataloader.MAX_LENGTH):
+
+    encoder_optimizer.zero_grad()
+    decoder_optimizer.zero_grad()
+
+    input_length,target_length=input_tensor.size(0),target_tensor.size(0)
+
+    encoder_hidden=encoder.initHidden().to(device)
+
+    encoder_outputs=torch.zeros(max_length,encoder.hidden_size).to(device)
+
+    loss=0
+    for ei in range(input_length):
+        encoder_output,encoder_hidden=encoder(input_tensor[ei],encoder_hidden)
+
+        encoder_outputs[ei]=encoder_output[0,0]
+
+
+
+
