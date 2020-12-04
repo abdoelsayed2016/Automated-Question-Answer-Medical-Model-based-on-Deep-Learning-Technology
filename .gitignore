@@ -2,6 +2,9 @@
 .idea
 data/.gitkeep
 venv
+baseline-GRU-loss.png
+decoder.pth
+encoder.pth
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
