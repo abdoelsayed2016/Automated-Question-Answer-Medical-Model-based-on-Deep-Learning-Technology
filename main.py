@@ -23,6 +23,7 @@ def argparser():
     p.add_argument('--num_iters', required=True, type=int)
     p.add_argument('--embedding_size', type=int, default=300)
     p.add_argument('--hidden_size', type=int, default=300)
+    p.add_argument('--type',required=True, type=str)
 
     configuration = p.parse_args()
     return configuration
@@ -68,14 +69,19 @@ def tensorFromPair(pair):
 
 
 def train(input_tensor, target_tensor, encoder, decoder, encoder_optimizer, decoder_optimizer,
-          criterion, max_length=dataloader.MAX_LENGTH):
+          criterion,type='gru', max_length=dataloader.MAX_LENGTH):
     encoder_optimizer.zero_grad()
     decoder_optimizer.zero_grad()
 
     input_length, target_length = input_tensor.size(0), target_tensor.size(0)
+    #print(type)
+    if type=='gru':
+        encoder_hidden = encoder.init_hidden().to(device)
+    else:
+        #print("asdadsadadasaaaaaaaaaaaaaaaaa")
+        encoder_hidden = (encoder.init_hidden().to(device), encoder.init_hidden().to(device))
 
-    encoder_hidden = encoder.init_hidden().to(device)
-
+    print(max_length,encoder.hidden_size)
     encoder_outputs = torch.zeros(max_length, encoder.hidden_size).to(device)
 
     loss = 0
@@ -118,7 +124,7 @@ def train(input_tensor, target_tensor, encoder, decoder, encoder_optimizer, deco
     return  loss.item()/target_length
 
 def trainiters(pairs,encoder,decoder,n_iters,
-               train_pairs_seed=0, print_every=1000, plot_every=1000, learning_rate=.01):
+               train_pairs_seed=0, print_every=1000, plot_every=1000, learning_rate=.01,type='gru'):
     start=time.time()
     plot_losses=[]
     print_loss_total,plot_loss_total=0,0
@@ -135,7 +141,7 @@ def trainiters(pairs,encoder,decoder,n_iters,
 
         input_tensor,target_tensor=pair[0],pair[1]
 
-        loss=train(input_tensor,target_tensor,encoder,decoder,encoder_optimizer,decoder_optimizer,criterion)
+        loss=train(input_tensor,target_tensor,encoder,decoder,encoder_optimizer,decoder_optimizer,criterion,type=type)
 
         print_loss_total+=loss
         plot_loss_total+=loss
@@ -151,8 +157,11 @@ def trainiters(pairs,encoder,decoder,n_iters,
             plot_losses.append(plot_loss_avg)
             plot_loss_total=0
     showPlot(plot_losses)
+    if type=='gru':
 
-    plt.savefig('baseline-GRU-loss')
+        plt.savefig('baseline-GRU-loss')
+    else:
+        plt.savefig('baseline-LSTM-loss')
     torch.save(encoder.state_dict(), 'encoder.pth')
     torch.save(decoder.state_dict(), 'decoder.pth')
 
@@ -166,11 +175,11 @@ if __name__ == "__main__":
     input_lang, output_lang, pairs = dataloader.perpare_dataset('q', 'a')
 
     encoder = seq2seq.GRUEncodeer(input_size=input_lang.num_words, embedding_size=config.embedding_size,
-                                  hidden_size=config.hidden_size).to(device)
+                                  hidden_size=config.hidden_size,type=config.type).to(device)
 
     decoder = seq2seq.GRUDecoder(output_size=output_lang.num_words,
                                  embedding_size=config.embedding_size,
-                                 hidden_size=config.hidden_size).to(device)
+                                 hidden_size=config.hidden_size,type=config.type).to(device)
 
 
     print(encoder,decoder)
@@ -180,4 +189,4 @@ if __name__ == "__main__":
         decoder.load_state_dict(torch.load('decoder.pth'))
 
 
-    trainiters(pairs, encoder, decoder, config.num_iters)
+    trainiters(pairs, encoder, decoder, config.num_iters,type=config.type)
