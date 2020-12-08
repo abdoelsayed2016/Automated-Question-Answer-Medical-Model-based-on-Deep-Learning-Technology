@@ -25,8 +25,9 @@ class BiLSTMEncoder(nn.Module):
         return torch.zeros(1 * 2, 1, int(self.hidden_size / 2))
 
 
-class BiLSTMEncoder(nn.Module):
+class BiLSTMDecoder(nn.Module):
     def __init__(self, output_size, embedding_size, hidden_size):
+        super(BiLSTMDecoder,self).__init__()
         self.output_size = output_size
         self.embedding_size = embedding_size
         self.hidden_size = hidden_size
