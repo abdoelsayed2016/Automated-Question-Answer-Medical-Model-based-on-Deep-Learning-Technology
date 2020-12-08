@@ -114,7 +114,7 @@ if __name__ == "__main__":
     '''
     config = argparser()
 
-    input_lang, output_lang, pairs = data.perpare_dataset('eng', 'fra')
+    input_lang, output_lang, pairs = data.perpare_dataset('q', 'a')
 
     encoder = seq2seq.GRUEncoder(input_size=input_lang.n_words,
                                  embedding_size=config.embedding_size,
