@@ -2,10 +2,11 @@ import unicodedata
 import re
 import random
 
+import numpy as np
 SOS_token, EOS_token = 0, 1
 MAX_LENGTH = 75
 
-
+from word_embedding as embed
 class Lang:
     def __init__(self, name):
         self.name = name
@@ -74,6 +75,18 @@ def perpare_dataset(q,a):
 
     return input, output, pairs
 
+def prepareEmbMatrix(trained_vector_paths,vector_size,input_lang,output_size):
+    input_emb_matrix=embed.get_embedding_matriz(input_lang.word2index,
+                                                    trained_vector_paths[0], vector_size)
+    output_emb_matrix = embed.get_embedding_matrix(output_lang.word2index,
+                                                    trained_vector_paths[1], vector_size)
+    SOS_token_vec = embed.initSpecialToken(vector_size, 0)  # SOS
+    EOS_token_vec = embed.initSpecialToken(vector_size, 0)  # EOS
+
+    for idx, tvec in enumerate((SOS_token_vec, EOS_token_vec)):
+        input_emb_matrix[idx] = tvec
+        output_emb_matrix[idx] = tvec
+    return input_emb_matrix, output_emb_matrix
 
 if __name__ == "__main__":
     '''
@@ -83,4 +96,13 @@ if __name__ == "__main__":
         3. Make word lists from sentences in pairs
     '''
     input_lang, output_lang, pairs = perpare_dataset('q', 'a')
+
     print(random.choice(pairs))
+
+    trained_vector_paths=('cc.en.300.vec','cc.en.300.vec')
+
+    input_emb_matrix,output_emb_matrix=prepareEmbMatrix(trained_vector_paths, 300, input_lang, output_lang)
+    print('Embedding-matrix shape: {}, {}'.format(input_emb_matrix.shape, output_emb_matrix.shape))
+
+    np.save('input_emb_matrix', input_emb_matrix)
+    np.save('output_emb_matrix', output_emb_matrix)
