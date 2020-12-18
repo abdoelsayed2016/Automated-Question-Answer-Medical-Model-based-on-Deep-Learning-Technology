@@ -36,7 +36,9 @@ series = {ICEMIS'20}
 Artificial intelligence can now provide more solutions for different problems, especially in the medical field. One of those problems is the lack of answers to any given medical/health-related question. The Internet is full of forums that allow people to ask some specific questions and get great answers for them. Nevertheless, browsing these questions to locate a similar case to your own question, also finding a satisfying accurate answer is difficult and timeconsuming task. This research will introduce a solution to these problems by automating the process of generating qualified answers to these questions and creating a kind of digital doctor. Furthermore, this research will train an end-to-end model using the framework of RNN and the encoder decoder to generate sensible and useful answers to a small set of medical/health issues. The proposed model was trained and evaluated using data from various online services, such as WebMD, HealthTap, eHealthForums, and iCliniq.</p>*
 
 
-### Code
+## Code
+
+
 
 
 
