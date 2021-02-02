@@ -7,7 +7,6 @@
 and [Shaymaa Sdeek]() 
 
 
-
 Reference code for the paper [ Automated Question-Answer Medical Model based on Deep Learning Technology.](https://dl.acm.org/doi/10.1145/3410352.3410744) Abdelrahman Abdallah, Mahmoud Kasem, Mohamed A Hamada, and Shaymaa Sdeek, ICEMIS'20: Proceedings of the 6th International Conference on Engineering & MIS September 2020. If you use this code or our dataset, please cite our paper:
 
 
