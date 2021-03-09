@@ -1,6 +1,6 @@
 # Automated Question-Answer Medical Model based on Deep Learning Technology  
 
-
+ 
 [Abdelrahman Abdallah](https://scholar.google.com/citations?user=uoXhF1QAAAAJ&hl=ar),
 [Mahmoud Kasem](),
 [Mohamed A Hamada](),
